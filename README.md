@@ -1,2 +1,3 @@
 # Opinion
-this a opinion file
+
+This repository was initialized for the `master` branch setup.
