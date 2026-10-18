@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+
+{% block title %}
+{{ profile_user.username }} Profile
+{% endblock %}
+
+
+{% block content %}
+
+<div class="profile-card">
+
+    <h1>
+        {{ profile_user.username }}
+    </h1>
+
+
+    <div class="statistics">
+
+        <div class="stat-card">
+
+            <h3>
+                Posts
+            </h3>
+
+            <p>
+                {{ posts_count }}
+            </p>
+
+        </div>
+
+
+        <div class="stat-card">
+
+            <h3>
+                Comments
+            </h3>
+
+            <p>
+                {{ comments_count }}
+            </p>
+
+        </div>
+
+
+        <div class="stat-card">
+
+            <h3>
+                Likes Given
+            </h3>
+
+            <p>
+                {{ likes_given }}
+            </p>
+
+        </div>
+
+
+        <div class="stat-card">
+
+            <h3>
+                Ratings Given
+            </h3>
+
+            <p>
+                {{ ratings_given }}
+            </p>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

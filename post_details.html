@@ -1,0 +1,285 @@
+{% extends 'base.html' %}
+
+{% block title %}
+{{ post.title }}
+{% endblock %}
+
+
+{% block content %}
+
+<article class="detail-card">
+
+    <h1>
+        {{ post.title }}
+    </h1>
+
+    <p class="author">
+        Written by
+        <a href="{% url 'profile' post.author.username %}">
+            {{ post.author.username }}
+        </a>
+    </p>
+
+    <p class="date">
+        Created:
+        {{ post.created_at|date:"M d, Y H:i" }}
+    </p>
+
+    {% if post.updated_at != post.created_at %}
+
+        <p class="date">
+            Updated:
+            {{ post.updated_at|date:"M d, Y H:i" }}
+        </p>
+
+    {% endif %}
+
+
+    <div class="post-content">
+
+        {{ post.content|linebreaks }}
+
+    </div>
+
+
+    <div class="post-stats large">
+
+        <span>
+            Likes:
+            {{ post.post_likes.count }}
+        </span>
+
+        <span>
+            Comments:
+            {{ post.comments.count }}
+        </span>
+
+        <span>
+            Ratings:
+            {{ post.ratings.count }}
+        </span>
+
+        <span>
+
+            {% if post.ratings.count > 0 %}
+
+                Average:
+                {{ post.ratings.all|dictsort:"rating"|last.rating }}/5
+
+            {% endif %}
+
+        </span>
+
+    </div>
+
+
+    {% if user.is_authenticated %}
+
+        <form method="post"
+              action="{% url 'toggle_post_like' post.pk %}">
+
+            {% csrf_token %}
+
+            {% if user in post.post_likes.all %}
+
+                <button class="danger-button"
+                        type="submit">
+                    Unlike
+                </button>
+
+            {% else %}
+
+                <button class="primary-button"
+                        type="submit">
+                    Like
+                </button>
+
+            {% endif %}
+
+        </form>
+
+
+        {% if post.author == user %}
+
+            <div class="action-buttons">
+
+                <a href="{% url 'edit_post' post.pk %}"
+                   class="edit-button">
+                    Edit Post
+                </a>
+
+                <a href="{% url 'delete_post' post.pk %}"
+                   class="delete-button">
+                    Delete Post
+                </a>
+
+            </div>
+
+        {% endif %}
+
+    {% endif %}
+
+</article>
+
+
+<!-- Rating -->
+
+<section class="section-card">
+
+    <h2>
+        Post Rating
+    </h2>
+
+    <p>
+        Total Ratings:
+        {{ post.ratings.count }}
+    </p>
+
+    {% if post.ratings.count %}
+
+        <p>
+            Average Rating:
+            {{ post.ratings.all|dictsort:"rating"|last.rating }}/5
+        </p>
+
+    {% else %}
+
+        <p>
+            No ratings yet.
+        </p>
+
+    {% endif %}
+
+
+    {% if user.is_authenticated %}
+
+        <form method="post"
+              action="{% url 'rate_post' post.pk %}">
+
+            {% csrf_token %}
+
+            <label>
+                Give a rating:
+            </label>
+
+            <select name="rating"
+                    class="form-control">
+
+                <option value="1"
+                    {% if user_rating and user_rating.rating == 1 %}
+                        selected
+                    {% endif %}>
+                    ★ 1
+                </option>
+
+                <option value="2"
+                    {% if user_rating and user_rating.rating == 2 %}
+                        selected
+                    {% endif %}>
+                    ★★ 2
+                </option>
+
+                <option value="3"
+                    {% if user_rating and user_rating.rating == 3 %}
+                        selected
+                    {% endif %}>
+                    ★★★ 3
+                </option>
+
+                <option value="4"
+                    {% if user_rating and user_rating.rating == 4 %}
+                        selected
+                    {% endif %}>
+                    ★★★★ 4
+                </option>
+
+                <option value="5"
+                    {% if user_rating and user_rating.rating == 5 %}
+                        selected
+                    {% endif %}>
+                    ★★★★★ 5
+                </option>
+
+            </select>
+
+            <button type="submit"
+                    class="primary-button">
+
+                {% if user_rating %}
+                    Update Rating
+                {% else %}
+                    Submit Rating
+                {% endif %}
+
+            </button>
+
+        </form>
+
+    {% endif %}
+
+</section>
+
+
+<!-- Add Comment -->
+
+<section class="section-card">
+
+    <h2>
+        Add Comment
+    </h2>
+
+    {% if user.is_authenticated %}
+
+        <form method="post"
+              action="{% url 'add_comment' post.pk %}">
+
+            {% csrf_token %}
+
+            {{ comment_form.as_p }}
+
+            <button type="submit"
+                    class="primary-button">
+                Add Comment
+            </button>
+
+        </form>
+
+    {% else %}
+
+        <p>
+            Please
+            <a href="{% url 'login' %}">
+                login
+            </a>
+            to comment.
+        </p>
+
+    {% endif %}
+
+</section>
+
+
+<!-- Comments -->
+
+<section class="comments-section">
+
+    <h2>
+        Comments ({{ post.comments.count }})
+    </h2>
+
+
+    {% for node in comment_tree %}
+
+        {% include 'comment.html' with node=node %}
+
+    {% empty %}
+
+        <p>
+            No comments yet.
+        </p>
+
+    {% endfor %}
+
+</section>
+
+{% endblock %}

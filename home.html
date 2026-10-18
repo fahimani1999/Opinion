@@ -1,0 +1,219 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Home - Advanced Blog
+{% endblock %}
+
+
+{% block content %}
+
+<section class="hero">
+
+    <h1>
+        Advanced Blog
+    </h1>
+
+    <p>
+        Share knowledge, write posts and discuss with others.
+    </p>
+
+</section>
+
+
+<section class="search-box">
+
+    <form method="get"
+          action="{% url 'search_posts' %}">
+
+        <input
+            type="text"
+            name="q"
+            placeholder="Search title, content or author..."
+            value="{{ search }}"
+        >
+
+        <button type="submit">
+            Search
+        </button>
+
+    </form>
+
+</section>
+
+
+<section class="statistics">
+
+    <div class="stat-card">
+        <h3>
+            Posts
+        </h3>
+
+        <p>
+            {{ statistics.total_posts|default:0 }}
+        </p>
+    </div>
+
+
+    <div class="stat-card">
+        <h3>
+            Likes
+        </h3>
+
+        <p>
+            {{ statistics.total_likes|default:0 }}
+        </p>
+    </div>
+
+
+    <div class="stat-card">
+        <h3>
+            Comments
+        </h3>
+
+        <p>
+            {{ statistics.total_comments|default:0 }}
+        </p>
+    </div>
+
+
+    <div class="stat-card">
+        <h3>
+            Ratings
+        </h3>
+
+        <p>
+            {{ statistics.total_ratings|default:0 }}
+        </p>
+    </div>
+
+</section>
+
+
+<h2>
+    Popular Posts
+</h2>
+
+<div class="post-grid">
+
+    {% for post in popular_posts %}
+
+        <article class="post-card">
+
+            <h2>
+                <a href="{% url 'post_detail' post.pk %}">
+                    {{ post.title }}
+                </a>
+            </h2>
+
+            <p class="author">
+                By
+                <a href="{% url 'profile' post.author.username %}">
+                    {{ post.author.username }}
+                </a>
+            </p>
+
+            <p>
+                {{ post.content|truncatewords:30 }}
+            </p>
+
+            <div class="post-stats">
+
+                <span>
+                    Likes: {{ post.total_likes }}
+                </span>
+
+                <span>
+                    Comments: {{ post.total_comments }}
+                </span>
+
+                <span>
+                    Ratings: {{ post.total_ratings }}
+                </span>
+
+                <span>
+                    {% if post.average_rating %}
+                        Rating:
+                        {{ post.average_rating|floatformat:1 }}/5
+                    {% else %}
+                        No rating
+                    {% endif %}
+                </span>
+
+            </div>
+
+            <a class="read-more"
+               href="{% url 'post_detail' post.pk %}">
+                Read More
+            </a>
+
+        </article>
+
+    {% empty %}
+
+        <p>
+            No posts found.
+        </p>
+
+    {% endfor %}
+
+</div>
+
+
+<h2 class="section-title">
+    All Posts
+</h2>
+
+
+<div class="post-grid">
+
+    {% for post in posts %}
+
+        <article class="post-card">
+
+            <h2>
+                <a href="{% url 'post_detail' post.pk %}">
+                    {{ post.title }}
+                </a>
+            </h2>
+
+            <p>
+                By {{ post.author.username }}
+            </p>
+
+            <p>
+                {{ post.content|truncatewords:25 }}
+            </p>
+
+            <div class="post-stats">
+
+                <span>
+                    Likes: {{ post.total_likes }}
+                </span>
+
+                <span>
+                    Comments: {{ post.total_comments }}
+                </span>
+
+                <span>
+                    {% if post.average_rating %}
+                        ★ {{ post.average_rating|floatformat:1 }}
+                    {% else %}
+                        No rating
+                    {% endif %}
+                </span>
+
+            </div>
+
+        </article>
+
+    {% empty %}
+
+        <p>
+            No posts available.
+        </p>
+
+    {% endfor %}
+
+</div>
+
+{% endblock %}

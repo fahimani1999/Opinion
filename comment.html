@@ -1,0 +1,114 @@
+<div class="comment">
+
+    <div class="comment-header">
+
+        <strong>
+            {{ node.comment.author.username }}
+        </strong>
+
+        <span>
+            {{ node.comment.created_at|date:"M d, Y H:i" }}
+        </span>
+
+    </div>
+
+
+    <p>
+        {{ node.comment.content }}
+    </p>
+
+
+    <div class="comment-actions">
+
+        <span>
+            Likes:
+            {{ node.comment.comment_likes.count }}
+        </span>
+
+
+        {% if user.is_authenticated %}
+
+            <form method="post"
+                  action="{% url 'toggle_comment_like' node.comment.pk %}"
+                  class="inline-form">
+
+                {% csrf_token %}
+
+                <button type="submit">
+                    Like / Unlike
+                </button>
+
+            </form>
+
+
+            <details>
+
+                <summary>
+                    Reply
+                </summary>
+
+                <form method="post"
+                      action="{% url 'add_comment' node.comment.post.pk %}">
+
+                    {% csrf_token %}
+
+                    <input type="hidden"
+                           name="parent_id"
+                           value="{{ node.comment.pk }}">
+
+                    <textarea name="content"
+                              rows="3"
+                              placeholder="Write your reply..."
+                              required></textarea>
+
+                    <button type="submit"
+                            class="primary-button">
+                        Reply
+                    </button>
+
+                </form>
+
+            </details>
+
+
+            {% if node.comment.author == user %}
+
+                <a href="#edit-comment-{{ node.comment.pk }}">
+                    Edit
+                </a>
+
+                <form method="post"
+                      action="{% url 'delete_comment' node.comment.pk %}"
+                      class="inline-form">
+
+                    {% csrf_token %}
+
+                    <button type="submit"
+                            class="delete-text">
+                        Delete
+                    </button>
+
+                </form>
+
+            {% endif %}
+
+        {% endif %}
+
+    </div>
+
+
+    {% if node.replies %}
+
+        <div class="replies">
+
+            {% for reply in node.replies %}
+
+                {% include 'comment.html' with node=reply %}
+
+            {% endfor %}
+
+        </div>
+
+    {% endif %}
+
+</div>
